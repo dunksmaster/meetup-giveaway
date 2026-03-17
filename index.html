@@ -228,10 +228,11 @@ canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 0 5px rgba(245,200,66,0.1),0
 
       <div class="manual-card">
         <div class="manual-title">// Shto Pjesëmarrës</div>
-        <div class="manual-row">
-          <input class="manual-input" id="manualName" type="text" placeholder="Emri i pjesëmarrësit" autocomplete="off">
-          <button class="btn-add-entry" onclick="addEntry()">+ Shto</button>
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:10px;line-height:1.5;">
+          Kopjo emrat nga WhatsApp dhe paste këtu — një emër për rresht:
         </div>
+        <textarea class="manual-input" id="manualName" rows="4" placeholder="miri&#10;tigri&#10;lroi&#10;tani" style="resize:vertical;line-height:1.6;font-size:0.9rem;"></textarea>
+        <button class="btn-add-entry" onclick="addEntry()" style="width:100%;margin-top:8px;padding:11px;">+ Shto të Gjithë</button>
       </div>
 
       <div class="entries-feed" id="entriesFeed">
@@ -367,15 +368,33 @@ function startGiveaway(){
 // ── MANUAL ENTRY ──
 function addEntry(){
   const inp = document.getElementById('manualName');
-  const name = inp.value.trim();
-  if(!name) return showToast('Shkruaj emrin!','error');
-  if(state.entries.find(e=>e.name.toLowerCase()===name.toLowerCase()))
-    return showToast('Ky emër është tashmë në listë!','error');
-  state.entries.unshift({ name, color: COLORS[state.entries.length % COLORS.length] });
+  const raw = inp.value.trim();
+  if(!raw) return showToast('Shkruaj të paktën një emër!','error');
+
+  // Split by newline, comma, or semicolon — clean each name
+  const names = raw.split(/[\n,;]+/)
+    .map(n => n.trim())
+    .filter(n => n.length > 0);
+
+  if(!names.length) return showToast('Nuk u gjet asnjë emër!','error');
+
+  let added = 0, skipped = 0;
+  names.forEach(name => {
+    if(state.entries.find(e => e.name.toLowerCase() === name.toLowerCase())){
+      skipped++;
+    } else {
+      state.entries.push({ name, color: COLORS[state.entries.length % COLORS.length] });
+      added++;
+    }
+  });
+
   inp.value = '';
   inp.focus();
   renderFeed();
-  showToast('✓ '+name+' u shtua!');
+
+  if(added > 0 && skipped === 0) showToast(`✓ ${added} pjesëmarrës u shtuan!`);
+  else if(added > 0 && skipped > 0) showToast(`✓ ${added} shtuar, ${skipped} ekzistonin tashmë`);
+  else showToast('Të gjithë emrat ekzistojnë tashmë!','error');
 }
 
 function removeEntry(idx){
@@ -558,8 +577,8 @@ function showToast(msg,type){
   t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// ── ENTER KEY ──
-document.getElementById('manualName').addEventListener('keydown',e=>{ if(e.key==='Enter') addEntry(); });
+// ── ENTER KEY — Ctrl+Enter për textarea ──
+document.getElementById('manualName').addEventListener('keydown',e=>{ if(e.key==='Enter' && e.ctrlKey) addEntry(); });
 
 drawWheel();
 </script>
