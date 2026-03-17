@@ -128,22 +128,49 @@ canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 0 5px rgba(245,200,66,0.1),0
 .winner-prize{display:inline-flex;align-items:center;gap:7px;background:rgba(245,200,66,0.09);border:1px solid rgba(245,200,66,0.28);border-radius:8px;padding:9px 18px;font-size:0.95rem;font-weight:600;color:var(--gold);margin-bottom:26px;}
 .modal-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
 
-/* ── WINNERS PAGE ── */
-#winnersPage{padding:56px 40px;align-items:center;}
-.winners-wrap{max-width:700px;width:100%;}
-.winners-header{text-align:center;margin-bottom:40px;}
-.winners-header h2{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:0.07em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.winners-header p{color:var(--muted);margin-top:6px;font-size:0.88rem;}
-.winners-grid{display:flex;flex-direction:column;gap:9px;margin-bottom:28px;}
-.winner-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 18px;animation:slide-in 0.4s ease both;}
-.winner-row .rank{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);width:32px;text-align:center;flex-shrink:0;}
-.winner-row .w-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem;flex-shrink:0;}
-.winner-row .w-info{flex:1;}
-.winner-row .w-name{font-weight:600;font-size:0.97rem;}
-.winner-row .w-prize{display:flex;align-items:center;gap:5px;background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.18);border-radius:6px;padding:5px 11px;font-size:0.82rem;font-weight:600;color:var(--gold);}
-.winners-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-.btn-outline-gold{padding:11px 24px;background:transparent;border:1.5px solid var(--gold);border-radius:8px;color:var(--gold);font-family:'Inter',sans-serif;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.2s;}
-.btn-outline-gold:hover{background:rgba(245,200,66,0.09);}
+/* ── WINNERS LIVE BOARD ── */
+.live-winner-card{
+  display:flex;align-items:center;gap:18px;
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:20px 24px;
+  animation:winner-pop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+  position:relative;overflow:hidden;
+}
+.live-winner-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(245,200,66,0.04),transparent 60%);
+  pointer-events:none;
+}
+@keyframes winner-pop{
+  0%{opacity:0;transform:scale(0.7) translateY(20px);}
+  100%{opacity:1;transform:scale(1) translateY(0);}
+}
+.lwc-rank{
+  font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:1;
+  width:52px;text-align:center;flex-shrink:0;
+}
+.lwc-avatar{
+  width:52px;height:52px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;font-weight:700;
+  flex-shrink:0;border:2px solid rgba(255,255,255,0.08);
+}
+.lwc-info{flex:1;min-width:0;}
+.lwc-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.04em;line-height:1.1;}
+.lwc-label{font-size:0.68rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:2px;}
+.lwc-prize{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);
+  border-radius:10px;padding:10px 16px;
+  font-size:0.95rem;font-weight:600;color:var(--gold);
+  flex-shrink:0;white-space:nowrap;
+}
+
+/* rank colors */
+.lwc-rank-1{color:#FFD700;}
+.lwc-rank-2{color:#C0C0C0;}
+.lwc-rank-3{color:#CD7F32;}
+.lwc-rank-n{color:rgba(255,255,255,0.2);}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--green);border-radius:10px;padding:11px 22px;font-size:0.86rem;color:var(--green);z-index:9999;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;}
@@ -284,16 +311,25 @@ canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 0 5px rgba(245,200,66,0.1),0
   </div>
 </div>
 
-<!-- ══ WINNERS ══ -->
+<!-- ══ WINNERS LIVE BOARD ══ -->
 <div id="winnersPage" class="page">
-  <div class="winners-wrap">
-    <div class="winners-header">
-      <h2>🏆 FITUESIT</h2>
-      <p id="winnersSubtitle">Lista e plotë e fituesve</p>
+  <div style="width:100%;max-width:700px;margin:0 auto;padding:48px 24px;">
+
+    <div style="text-align:center;margin-bottom:40px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:3.8rem;letter-spacing:0.08em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="boardTitle">🏆 FITUESIT</div>
+      <div style="color:var(--muted);font-size:0.85rem;margin-top:6px;" id="boardSubtitle">Lista live e fituesve</div>
     </div>
-    <div class="winners-grid" id="winnersGrid"></div>
-    <div class="winners-actions">
-      <button class="btn-outline-gold" onclick="goToWheel()">← Rrotullimi</button>
+
+    <!-- Live winners list -->
+    <div id="liveWinnersList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:36px;"></div>
+
+    <!-- Empty state -->
+    <div id="boardEmpty" style="text-align:center;color:var(--muted);padding:60px 0;font-size:0.9rem;">
+      Asnjë fitues ende — fillo rrotullimin 🎡
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <button class="btn-outline-gold" onclick="goToWheel()">🎡 Vazhdo Shortun</button>
       <button class="btn-outline-gold" onclick="exportWinners()">📋 Kopjo Listën</button>
       <button class="btn-primary" style="padding:11px 24px;width:auto;" onclick="resetAll()">🔄 Giveaway i Ri</button>
     </div>
@@ -499,12 +535,14 @@ function confirmWinner(){
   cfg.prizes[state.currentPrizeIdx].remaining--;
   if(cfg.prizes[state.currentPrizeIdx].remaining<=0) advancePrize();
   document.getElementById('winnerModal').classList.remove('show');
-  document.getElementById('btnSpin').disabled=false;
-  document.getElementById('spinStatus').textContent=`🏆 Fitues ${state.winners.length} u konfirmua!`;
-  buildPrizeQueue(); drawWheel();
-  showToast('🏆 '+state.pendingWinner.name+' fitoi!');
-  state.pendingWinner=null;
-  if(state.currentPrizeIdx>=cfg.prizes.length){document.getElementById('btnSpin').disabled=true; setTimeout(goToWinners,1500);}
+
+  // Show live winners board immediately after confirm
+  showPage('winnersPage');
+  renderWinners();
+
+  const name = state.pendingWinner.name;
+  state.pendingWinner = null;
+  showToast('🏆 ' + name + ' fitoi!');
 }
 
 function rejectWinner(){
@@ -533,16 +571,64 @@ function buildPrizeQueue(){
   }).join('');
 }
 
-// ── WINNERS PAGE ──
+// ── LIVE WINNERS BOARD ──
+const TROPHIES = ['🥇','🥈','🥉'];
+const RANK_COLORS = ['#FFD700','#C0C0C0','#CD7F32'];
+
 function renderWinners(){
-  document.getElementById('winnersSubtitle').textContent=state.winners.length+' fitues nga '+state.entries.length+' pjesëmarrës';
-  document.getElementById('winnersGrid').innerHTML=state.winners.map((w,i)=>`
-    <div class="winner-row" style="animation-delay:${i*0.07}s">
-      <div class="rank">${i+1}</div>
-      <div class="w-avatar" style="background:${COLORS[i%COLORS.length]}22;color:${COLORS[i%COLORS.length]}">${w.name.charAt(0).toUpperCase()}</div>
-      <div class="w-info"><div class="w-name">${w.name}</div></div>
-      <div class="w-prize">${w.prizeEmoji} ${w.prize}</div>
-    </div>`).join('')||'<div style="text-align:center;color:var(--muted);padding:40px">Nuk ka fitues ende.</div>';
+  const list = document.getElementById('liveWinnersList');
+  const empty = document.getElementById('boardEmpty');
+  document.getElementById('boardSubtitle').textContent = state.winners.length + ' fitues nga ' + state.entries.length + ' pjesëmarrës';
+  empty.style.display = state.winners.length ? 'none' : 'block';
+
+  list.innerHTML = '';
+  state.winners.forEach((w, i) => {
+    const isNew = i === state.winners.length - 1;
+    const trophy = i < 3 ? TROPHIES[i] : '#' + (i+1);
+    const rankColor = i < 3 ? RANK_COLORS[i] : 'rgba(255,255,255,0.18)';
+    const color = COLORS[i % COLORS.length];
+    const card = document.createElement('div');
+    card.className = 'live-winner-card';
+    if(isNew) card.style.borderColor = 'rgba(245,200,66,0.45)';
+    card.innerHTML = `
+      <div class="lwc-rank" style="color:${rankColor}">${trophy}</div>
+      <div class="lwc-avatar" style="background:${color}22;color:${color}">${w.name.charAt(0).toUpperCase()}</div>
+      <div class="lwc-info">
+        <div class="lwc-name">${w.name}</div>
+        <div class="lwc-label">Fitues #${i+1} · ${w.prize}</div>
+      </div>
+      <div class="lwc-prize">${w.prizeEmoji} ${w.prize}</div>`;
+    list.appendChild(card);
+  });
+
+  if(isFinished()) {
+    document.getElementById('boardTitle').textContent = '🏆 GIVEAWAY PËRFUNDOI!';
+    document.querySelector('#winnersPage .btn-outline-gold').textContent = '🏁 Giveaway Përfundoi';
+  }
+
+  spawnBoardConfetti();
+}
+
+function isFinished(){
+  return state.currentPrizeIdx >= cfg.prizes.length ||
+    cfg.prizes.every(p => p.remaining <= 0);
+}
+
+function goToWinners(){ showPage('winnersPage'); renderWinners(); }
+
+function spawnBoardConfetti(){
+  // Full-screen confetti burst
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;';
+  document.body.appendChild(wrap);
+  ['#f5c842','#ff6b6b','#4ecdc4','#a29bfe','#fd79a8','#55efc4','#fdcb6e'].forEach(c=>{
+    for(let i=0;i<8;i++){
+      const el=document.createElement('div');
+      el.style.cssText=`position:absolute;left:${Math.random()*100}%;top:${-10-Math.random()*20}px;background:${c};width:${7+Math.random()*9}px;height:${7+Math.random()*9}px;border-radius:2px;animation:confetti-fall ${2+Math.random()*2}s ease-in ${Math.random()*0.8}s forwards;`;
+      wrap.appendChild(el);
+    }
+  });
+  setTimeout(()=>wrap.remove(), 4000);
 }
 
 function exportWinners(){
@@ -557,7 +643,7 @@ function resetAll(){
   showPage('adminPage');
 }
 
-// ── CONFETTI ──
+// ── CONFETTI (modal) ──
 function spawnConfetti(){
   const w=document.getElementById('confettiWrap'); w.innerHTML='';
   ['#f5c842','#ff6b6b','#4ecdc4','#a29bfe','#fd79a8','#55efc4'].forEach(c=>{
@@ -577,7 +663,7 @@ function showToast(msg,type){
   t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// ── ENTER KEY — Ctrl+Enter për textarea ──
+// ── ENTER KEY ──
 document.getElementById('manualName').addEventListener('keydown',e=>{ if(e.key==='Enter' && e.ctrlKey) addEntry(); });
 
 drawWheel();
