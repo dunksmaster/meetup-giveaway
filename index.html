@@ -364,7 +364,6 @@ let state = { entries:[], winners:[], currentPrizeIdx:0, spinning:false, pending
 function showPage(id){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function goToAdmin(){ showPage('adminPage'); }
 function goToWheel(){ showPage('wheelPage'); buildPrizeQueue(); drawWheel(); }
-function goToWinners(){ showPage('winnersPage'); renderWinners(); }
 
 // ── ADMIN ──
 function addPrize(){
@@ -456,8 +455,17 @@ function renderFeed(){
     <div class="entry-item">
       <div class="entry-avatar" style="background:${e.color}22;color:${e.color}">${e.name.charAt(0).toUpperCase()}</div>
       <div class="entry-name-txt">${e.name}</div>
-      <button class="entry-del" onclick="removeEntry(${i})">✕</button>
+      <button class="entry-del" data-idx="${i}">✕</button>
     </div>`).join('');
+
+  // FIX #4 — attach listeners after render using data-idx, not inline onclick
+  feed.querySelectorAll('.entry-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-idx'));
+      state.entries.splice(idx, 1);
+      renderFeed();
+    });
+  });
 }
 
 // ── WHEEL ──
@@ -531,24 +539,32 @@ function pickWinner(){
 
 function confirmWinner(){
   if(!state.pendingWinner) return;
+  // FIX #1 — save name BEFORE nulling pendingWinner
+  const name = state.pendingWinner.name;
   state.winners.push(state.pendingWinner);
   cfg.prizes[state.currentPrizeIdx].remaining--;
   if(cfg.prizes[state.currentPrizeIdx].remaining<=0) advancePrize();
   document.getElementById('winnerModal').classList.remove('show');
-
-  // Show live winners board immediately after confirm
-  showPage('winnersPage');
-  renderWinners();
-
-  const name = state.pendingWinner.name;
   state.pendingWinner = null;
+
+  // FIX #3 — re-enable spin button before leaving wheel page
+  document.getElementById('btnSpin').disabled = false;
+  document.getElementById('spinStatus').textContent = '🏆 ' + name + ' fitoi! Rrotulloje sërisht.';
+  buildPrizeQueue();
+  drawWheel();
+
+  // Show live winners board
+  showPage('winnersPage');
+  renderWinners(true); // true = new winner, spawn confetti
+
   showToast('🏆 ' + name + ' fitoi!');
 }
 
 function rejectWinner(){
   document.getElementById('winnerModal').classList.remove('show');
   document.getElementById('btnSpin').disabled=false;
-  state.pendingWinner=null; spinWheel();
+  state.pendingWinner=null;
+  spinWheel();
 }
 
 function advancePrize(){
@@ -571,25 +587,39 @@ function buildPrizeQueue(){
   }).join('');
 }
 
+// FIX #2 — single goToWinners declaration (removed duplicate from nav section)
+function goToWinners(){ showPage('winnersPage'); renderWinners(false); }
+
 // ── LIVE WINNERS BOARD ──
 const TROPHIES = ['🥇','🥈','🥉'];
 const RANK_COLORS = ['#FFD700','#C0C0C0','#CD7F32'];
 
-function renderWinners(){
+// FIX #5 — guard against empty cfg.prizes
+// FIX #6 — spawnConfetti only when newWinner=true
+function renderWinners(newWinner){
   const list = document.getElementById('liveWinnersList');
   const empty = document.getElementById('boardEmpty');
-  document.getElementById('boardSubtitle').textContent = state.winners.length + ' fitues nga ' + state.entries.length + ' pjesëmarrës';
+  const subtitle = document.getElementById('boardSubtitle');
+  const boardTitle = document.getElementById('boardTitle');
+
+  subtitle.textContent = state.winners.length + ' fitues nga ' + state.entries.length + ' pjesëmarrës';
   empty.style.display = state.winners.length ? 'none' : 'block';
 
   list.innerHTML = '';
   state.winners.forEach((w, i) => {
-    const isNew = i === state.winners.length - 1;
+    const isNew = newWinner && i === state.winners.length - 1;
     const trophy = i < 3 ? TROPHIES[i] : '#' + (i+1);
     const rankColor = i < 3 ? RANK_COLORS[i] : 'rgba(255,255,255,0.18)';
     const color = COLORS[i % COLORS.length];
+
     const card = document.createElement('div');
     card.className = 'live-winner-card';
+    // FIX #7 — use CSS classes properly instead of only inline styles
+    if(i < 3) card.classList.add('lwc-rank-' + (i+1));
     if(isNew) card.style.borderColor = 'rgba(245,200,66,0.45)';
+    // Only animate the newest card
+    if(!isNew) card.style.animation = 'none';
+
     card.innerHTML = `
       <div class="lwc-rank" style="color:${rankColor}">${trophy}</div>
       <div class="lwc-avatar" style="background:${color}22;color:${color}">${w.name.charAt(0).toUpperCase()}</div>
@@ -601,23 +631,27 @@ function renderWinners(){
     list.appendChild(card);
   });
 
-  if(isFinished()) {
-    document.getElementById('boardTitle').textContent = '🏆 GIVEAWAY PËRFUNDOI!';
-    document.querySelector('#winnersPage .btn-outline-gold').textContent = '🏁 Giveaway Përfundoi';
+  // FIX #5 — only show "finished" if prizes actually exist and are done
+  if(cfg.prizes && cfg.prizes.length > 0 && isFinished()){
+    boardTitle.textContent = '🏆 GIVEAWAY PËRFUNDOI!';
+    const continueBtn = document.querySelector('#winnersPage .btn-outline-gold');
+    if(continueBtn) continueBtn.textContent = '🏁 Giveaway Përfundoi';
+  } else {
+    boardTitle.textContent = '🏆 FITUESIT';
   }
 
-  spawnBoardConfetti();
+  // FIX #6 — confetti only on new winner confirmation
+  if(newWinner && state.winners.length > 0) spawnBoardConfetti();
 }
 
+// FIX #5 — guard cfg.prizes
 function isFinished(){
+  if(!cfg.prizes || !cfg.prizes.length) return false;
   return state.currentPrizeIdx >= cfg.prizes.length ||
     cfg.prizes.every(p => p.remaining <= 0);
 }
 
-function goToWinners(){ showPage('winnersPage'); renderWinners(); }
-
 function spawnBoardConfetti(){
-  // Full-screen confetti burst
   const wrap = document.createElement('div');
   wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;';
   document.body.appendChild(wrap);
@@ -661,6 +695,12 @@ function showToast(msg,type){
   const t=document.getElementById('toast');
   t.textContent=msg; t.style.borderColor=type==='error'?'var(--red)':'var(--green)'; t.style.color=type==='error'?'var(--red)':'var(--green)';
   t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// FIX #4 — removeEntry uses data-index attribute to avoid stale closure index bugs
+function removeEntry(idx){
+  state.entries.splice(idx,1);
+  renderFeed();
 }
 
 // ── ENTER KEY ──
