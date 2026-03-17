@@ -8,665 +8,200 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
-  --bg: #0a0a0f;
-  --card: #12121a;
-  --card2: #1a1a28;
-  --border: rgba(255,255,255,0.07);
-  --gold: #f5c842;
-  --gold2: #ffab00;
-  --green: #22d67a;
-  --red: #ff4d6d;
-  --blue: #4d9fff;
-  --text: #f0f0f8;
-  --muted: #6b6b85;
+  --bg:#0a0a0f;--card:#12121a;--card2:#1a1a28;
+  --border:rgba(255,255,255,0.07);
+  --gold:#f5c842;--gold2:#ffab00;--green:#22d67a;--red:#ff4d6d;
+  --text:#f0f0f8;--muted:#6b6b85;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(245,200,66,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,200,66,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.page{display:none;min-height:100vh;position:relative;z-index:1;}
+.page.active{display:flex;flex-direction:column;}
 
-/* BG GRID */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(245,200,66,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245,200,66,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none; z-index: 0;
-}
+/* ── ADMIN ── */
+#adminPage{align-items:center;justify-content:center;padding:40px 20px;}
+.admin-wrap{width:100%;max-width:580px;}
+.admin-logo{text-align:center;margin-bottom:36px;}
+.admin-logo h1{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:0.08em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.admin-logo p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:14px;}
+.card-title{font-size:0.68rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:0.76rem;color:var(--muted);margin-bottom:6px;font-weight:500;}
+.field input,.field select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.92rem;padding:10px 13px;outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus{border-color:var(--gold);}
+.field .hint{font-size:0.72rem;color:var(--muted);margin-top:5px;line-height:1.5;}
+.field .hint a{color:var(--gold);text-decoration:none;}
+.prizes-list{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
+.prize-row{display:grid;grid-template-columns:1fr 72px 34px;gap:7px;align-items:center;}
+.prize-row input{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.86rem;padding:9px 11px;outline:none;transition:border-color 0.2s;width:100%;}
+.prize-row input:focus{border-color:var(--gold);}
+.prize-row input[type="number"]{text-align:center;}
+.btn-icon{width:34px;height:34px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:7px;color:var(--red);cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.btn-icon:hover{background:rgba(255,77,109,0.22);}
+.btn-add{width:100%;padding:9px;background:rgba(245,200,66,0.06);border:1px dashed rgba(245,200,66,0.25);border-radius:8px;color:var(--gold);font-family:'Inter',sans-serif;font-size:0.83rem;cursor:pointer;transition:all 0.2s;}
+.btn-add:hover{background:rgba(245,200,66,0.12);}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#0a0a0f;font-family:'Inter',sans-serif;font-weight:700;font-size:0.97rem;cursor:pointer;transition:all 0.25s;letter-spacing:0.02em;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,200,66,0.28);}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-secondary{padding:10px 22px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.86rem;cursor:pointer;transition:all 0.2s;}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold);}
 
-/* ── PAGES ── */
-.page { display: none; min-height: 100vh; position: relative; z-index: 1; }
-.page.active { display: flex; flex-direction: column; }
+/* ── QR PAGE (admin view — no registration form) ── */
+#qrPage{align-items:center;justify-content:center;padding:60px 20px;gap:48px;flex-direction:row;flex-wrap:wrap;}
+.qr-left{display:flex;flex-direction:column;align-items:center;gap:18px;}
+.qr-box{background:white;padding:18px;border-radius:16px;display:inline-block;box-shadow:0 0 60px rgba(245,200,66,0.2);}
+.qr-event-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.1em;color:var(--gold);text-align:center;}
+.qr-instruction{color:var(--muted);font-size:0.82rem;text-align:center;max-width:220px;line-height:1.5;}
+.qr-url-box{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;max-width:240px;text-align:center;}
+.qr-url-box .lbl{font-size:0.58rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;}
+.qr-url-box .url{font-size:0.68rem;color:var(--gold);word-break:break-all;line-height:1.4;}
 
-/* ══════════════════════════════════════
-   PAGE 1 — ADMIN SETUP
-══════════════════════════════════════ */
-#adminPage {
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-}
-.admin-wrap {
-  width: 100%; max-width: 560px;
-}
-.admin-logo {
-  text-align: center;
-  margin-bottom: 40px;
-}
-.admin-logo h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 3.5rem;
-  letter-spacing: 0.08em;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.admin-logo p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+.qr-right{display:flex;flex-direction:column;gap:16px;min-width:280px;max-width:380px;}
+.entry-counter{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 28px;text-align:center;}
+.entry-counter .num{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--green);line-height:1;}
+.entry-counter .lbl{font-size:0.7rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px;}
+.entry-counter .sync-status{font-size:0.7rem;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-g 1.8s ease-in-out infinite;}
+@keyframes pulse-g{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,214,122,0.4);}50%{opacity:0.7;box-shadow:0 0 0 5px rgba(34,214,122,0);}}
+.entries-feed{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;}
+.entries-feed .empty{text-align:center;color:var(--muted);font-size:0.82rem;padding:20px 0;}
+.entry-item{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--card2);border-radius:7px;animation:slide-in 0.3s ease;}
+@keyframes slide-in{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:none;}}
+.entry-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;flex-shrink:0;}
+.entry-name{font-size:0.86rem;font-weight:500;flex:1;}
+.entry-time{font-size:0.65rem;color:var(--muted);white-space:nowrap;}
+.btn-start-wheel{padding:15px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#0a0a0f;font-family:'Inter',sans-serif;font-weight:700;font-size:0.97rem;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-start-wheel:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,200,66,0.28);}
+.btn-start-wheel:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.qr-footer-btns{display:flex;gap:10px;}
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 16px;
-}
-.card-title {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-.field { margin-bottom: 18px; }
-.field label {
-  display: block;
-  font-size: 0.78rem;
-  color: var(--muted);
-  margin-bottom: 7px;
-  font-weight: 500;
-}
-.field input, .field select {
-  width: 100%;
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  padding: 11px 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.field input:focus, .field select:focus { border-color: var(--gold); }
+/* ── MOBILE REG PAGE ── */
+#mobilePage{align-items:center;justify-content:center;padding:40px 20px;min-height:100vh;}
+.mobile-wrap{width:100%;max-width:400px;}
+.mobile-hero{text-align:center;margin-bottom:28px;}
+.mobile-hero .emoji{font-size:3.2rem;margin-bottom:10px;}
+.mobile-hero h1{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:0.07em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mobile-hero p{color:var(--muted);font-size:0.88rem;margin-top:6px;}
+.mobile-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;}
+.input-big{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:1rem;padding:14px 15px;outline:none;transition:border-color 0.2s;margin-bottom:11px;display:block;}
+.input-big:focus{border-color:var(--gold);}
+.mobile-success{display:none;text-align:center;padding:10px 0;}
+.mobile-success .s-emoji{font-size:3rem;margin-bottom:12px;}
+.mobile-success h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--green);margin-bottom:8px;}
+.mobile-success p{color:var(--muted);font-size:0.88rem;line-height:1.7;}
+.mobile-loading{display:none;text-align:center;padding:20px 0;color:var(--muted);font-size:0.88rem;}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.mobile-footer{text-align:center;font-size:0.72rem;color:var(--muted);margin-top:14px;line-height:1.6;}
 
-.prizes-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-.prize-row {
-  display: grid;
-  grid-template-columns: 1fr 80px 36px;
-  gap: 8px;
-  align-items: center;
-}
-.prize-row input {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.88rem;
-  padding: 9px 12px;
-  outline: none;
-  transition: border-color 0.2s;
-  width: 100%;
-}
-.prize-row input:focus { border-color: var(--gold); }
-.prize-row input[type="number"] { text-align: center; }
-.btn-icon {
-  width: 36px; height: 36px;
-  background: rgba(255,77,109,0.12);
-  border: 1px solid rgba(255,77,109,0.2);
-  border-radius: 8px;
-  color: var(--red);
-  cursor: pointer;
-  font-size: 1rem;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-}
-.btn-icon:hover { background: rgba(255,77,109,0.25); }
-.btn-add {
-  width: 100%;
-  padding: 10px;
-  background: rgba(245,200,66,0.07);
-  border: 1px dashed rgba(245,200,66,0.25);
-  border-radius: 8px;
-  color: var(--gold);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-add:hover { background: rgba(245,200,66,0.13); }
-
-.btn-primary {
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  border: none;
-  border-radius: 10px;
-  color: #0a0a0f;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.25s;
-  letter-spacing: 0.03em;
-}
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,200,66,0.3); }
-.btn-primary:active { transform: translateY(0); }
-
-.btn-secondary {
-  padding: 11px 24px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
-
-/* ══════════════════════════════════════
-   PAGE 2 — QR + REGISTRATION
-══════════════════════════════════════ */
-#qrPage {
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  gap: 24px;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-.qr-left {
-  flex: 1; min-width: 280px; max-width: 420px;
-  display: flex; flex-direction: column; align-items: center;
-  gap: 20px;
-}
-.qr-box {
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  display: inline-block;
-  box-shadow: 0 0 60px rgba(245,200,66,0.25);
-}
-.qr-label {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.6rem;
-  letter-spacing: 0.1em;
-  color: var(--gold);
-  text-align: center;
-}
-.qr-sub { color: var(--muted); font-size: 0.82rem; text-align: center; }
-.entry-count {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 28px;
-  text-align: center;
-}
-.entry-count .num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 3rem;
-  color: var(--green);
-  line-height: 1;
-}
-.entry-count .lbl { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; }
-
-.qr-right {
-  flex: 1; min-width: 280px; max-width: 460px;
-}
-
-.reg-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-}
-.reg-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2rem;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
-}
-.reg-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 28px; }
-
-.input-big {
-  width: 100%;
-  background: var(--card2);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 1.05rem;
-  padding: 14px 16px;
-  outline: none;
-  transition: border-color 0.2s;
-  margin-bottom: 12px;
-}
-.input-big:focus { border-color: var(--gold); }
-
-.entries-feed {
-  margin-top: 20px;
-  max-height: 220px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-right: 4px;
-}
-.entries-feed::-webkit-scrollbar { width: 4px; }
-.entries-feed::-webkit-scrollbar-track { background: transparent; }
-.entries-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-.entry-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  animation: slide-in 0.3s ease;
-}
-@keyframes slide-in {
-  from { opacity: 0; transform: translateX(-12px); }
-  to   { opacity: 1; transform: none; }
-}
-.entry-avatar {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700;
-  font-size: 0.85rem;
-  flex-shrink: 0;
-}
-.entry-name { font-size: 0.9rem; font-weight: 500; flex: 1; }
-.entry-email { font-size: 0.75rem; color: var(--muted); }
-.entry-time { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
-
-.btn-start-wheel {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  border: none;
-  border-radius: 10px;
-  color: #0a0a0f;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.25s;
-  margin-top: 20px;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.btn-start-wheel:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,200,66,0.3); }
-.btn-start-wheel:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-/* ══════════════════════════════════════
-   PAGE 3 — SPIN WHEEL
-══════════════════════════════════════ */
-#wheelPage {
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  gap: 40px;
-  flex-direction: column;
-}
-
-.wheel-header { text-align: center; }
-.wheel-header h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 3rem;
-  letter-spacing: 0.08em;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.wheel-header .prize-current {
-  font-size: 1rem;
-  color: var(--muted);
-  margin-top: 6px;
-}
-.wheel-header .prize-current span { color: var(--gold); font-weight: 600; }
-
-.wheel-area {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 48px;
-  flex-wrap: wrap;
-}
-
-.wheel-wrap {
-  position: relative;
-  width: 420px; height: 420px;
-  flex-shrink: 0;
-}
-.wheel-pointer {
-  position: absolute;
-  top: -18px; left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  filter: drop-shadow(0 4px 12px rgba(245,200,66,0.6));
-}
-.wheel-pointer svg { width: 36px; }
-
-canvas#wheelCanvas {
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 6px rgba(245,200,66,0.1),
-    0 0 0 12px rgba(245,200,66,0.05),
-    0 20px 60px rgba(0,0,0,0.6);
-  display: block;
-}
-
-.wheel-center {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
-  width: 64px; height: 64px;
-  background: var(--bg);
-  border: 4px solid var(--gold);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 5;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 0 24px rgba(245,200,66,0.4);
-}
-.wheel-center:hover { transform: translate(-50%,-50%) scale(1.1); }
-.wheel-center svg { width: 28px; color: var(--gold); }
-
-.wheel-side {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 260px;
-  max-width: 300px;
-}
-.wheel-side-title {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-
-.prize-queue {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-.prize-queue-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 16px;
-  transition: all 0.3s;
-}
-.prize-queue-item.active {
-  border-color: var(--gold);
-  background: rgba(245,200,66,0.06);
-}
-.prize-queue-item.done {
-  opacity: 0.35;
-  text-decoration: line-through;
-}
-.pq-emoji { font-size: 1.4rem; }
-.pq-info { flex: 1; }
-.pq-name { font-size: 0.9rem; font-weight: 600; }
-.pq-count { font-size: 0.72rem; color: var(--muted); }
-.pq-badge {
-  font-size: 0.65rem;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-.pq-badge.active { background: rgba(245,200,66,0.15); color: var(--gold); }
-.pq-badge.done { background: rgba(34,214,122,0.12); color: var(--green); }
-.pq-badge.pending { background: rgba(255,255,255,0.05); color: var(--muted); }
-
-.btn-spin {
-  padding: 14px 36px;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  border: none;
-  border-radius: 10px;
-  color: #0a0a0f;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.25s;
-  display: flex; align-items: center; gap: 10px;
-}
-.btn-spin:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,200,66,0.35); }
-.btn-spin:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+/* ── WHEEL ── */
+#wheelPage{align-items:center;justify-content:center;padding:32px 20px;gap:32px;flex-direction:column;}
+.wheel-header{text-align:center;}
+.wheel-header h2{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:0.07em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.wheel-header .prize-current{font-size:0.92rem;color:var(--muted);margin-top:5px;}
+.wheel-header .prize-current span{color:var(--gold);font-weight:600;}
+.wheel-area{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;}
+.wheel-wrap{position:relative;width:400px;height:400px;flex-shrink:0;}
+.wheel-pointer{position:absolute;top:-16px;left:50%;transform:translateX(-50%);z-index:10;filter:drop-shadow(0 4px 10px rgba(245,200,66,0.5));}
+.wheel-pointer svg{width:32px;}
+canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 0 5px rgba(245,200,66,0.1),0 0 0 10px rgba(245,200,66,0.05),0 16px 48px rgba(0,0,0,0.6);display:block;}
+.wheel-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:58px;height:58px;background:var(--bg);border:3px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:5;cursor:pointer;transition:all 0.2s;box-shadow:0 0 20px rgba(245,200,66,0.35);}
+.wheel-center:hover{transform:translate(-50%,-50%) scale(1.1);}
+.wheel-side{display:flex;flex-direction:column;gap:11px;min-width:250px;max-width:290px;}
+.wheel-side-title{font-size:0.65rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.prize-queue{display:flex;flex-direction:column;gap:7px;max-height:280px;overflow-y:auto;}
+.prize-queue-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 14px;transition:all 0.25s;}
+.prize-queue-item.active{border-color:var(--gold);background:rgba(245,200,66,0.05);}
+.prize-queue-item.done{opacity:0.3;}
+.pq-emoji{font-size:1.3rem;}
+.pq-info{flex:1;}
+.pq-name{font-size:0.87rem;font-weight:600;}
+.pq-count{font-size:0.7rem;color:var(--muted);}
+.pq-badge{font-size:0.62rem;padding:3px 7px;border-radius:4px;font-weight:600;}
+.pq-badge.active{background:rgba(245,200,66,0.14);color:var(--gold);}
+.pq-badge.done{background:rgba(34,214,122,0.1);color:var(--green);}
+.pq-badge.pending{background:rgba(255,255,255,0.05);color:var(--muted);}
+.btn-spin{padding:13px 30px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:9px;color:#0a0a0f;font-family:'Inter',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:8px;}
+.btn-spin:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(245,200,66,0.32);}
+.btn-spin:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none;}
 
 /* ── WINNER MODAL ── */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(8px);
-  z-index: 1000;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.3s;
-}
-.modal-overlay.show { opacity: 1; pointer-events: all; }
-.modal {
-  background: var(--card);
-  border: 1px solid rgba(245,200,66,0.3);
-  border-radius: 24px;
-  padding: 48px 40px;
-  text-align: center;
-  max-width: 440px;
-  width: 90%;
-  transform: scale(0.85);
-  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  position: relative;
-  overflow: hidden;
-}
-.modal-overlay.show .modal { transform: scale(1); }
-.modal::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(245,200,66,0.1), transparent 60%);
-  pointer-events: none;
-}
-.confetti-wrap {
-  position: absolute; inset: 0;
-  pointer-events: none; overflow: hidden;
-}
-.confetti-piece {
-  position: absolute;
-  width: 8px; height: 8px;
-  border-radius: 2px;
-  animation: confetti-fall 2.5s ease-in forwards;
-}
-@keyframes confetti-fall {
-  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(400px) rotate(720deg); opacity: 0; }
-}
-.winner-trophy { font-size: 4rem; margin-bottom: 12px; animation: bounce 0.6s 0.3s ease both; }
-@keyframes bounce {
-  0%,100% { transform: translateY(0); }
-  50%      { transform: translateY(-14px); }
-}
-.winner-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 8px;
-}
-.winner-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.8rem;
-  letter-spacing: 0.06em;
-  line-height: 1.1;
-  margin-bottom: 6px;
-}
-.winner-email { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; }
-.winner-prize {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(245,200,66,0.1);
-  border: 1px solid rgba(245,200,66,0.3);
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--gold);
-  margin-bottom: 28px;
-}
-.modal-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border:1px solid rgba(245,200,66,0.3);border-radius:22px;padding:44px 36px;text-align:center;max-width:420px;width:90%;transform:scale(0.85);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;}
+.modal-overlay.show .modal{transform:scale(1);}
+.modal::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(245,200,66,0.08),transparent 60%);pointer-events:none;}
+.confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confetti-fall 2.5s ease-in forwards;}
+@keyframes confetti-fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(400px) rotate(720deg);opacity:0;}}
+.winner-trophy{font-size:3.6rem;margin-bottom:10px;animation:bounce 0.6s 0.3s ease both;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.winner-label{font-size:0.68rem;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+.winner-name{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:0.05em;line-height:1.1;margin-bottom:5px;}
+.winner-email{color:var(--muted);font-size:0.85rem;margin-bottom:18px;}
+.winner-prize{display:inline-flex;align-items:center;gap:7px;background:rgba(245,200,66,0.09);border:1px solid rgba(245,200,66,0.28);border-radius:8px;padding:9px 18px;font-size:0.95rem;font-weight:600;color:var(--gold);margin-bottom:26px;}
+.modal-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
 
-/* ══════════════════════════════════════
-   PAGE 4 — WINNERS LIST
-══════════════════════════════════════ */
-#winnersPage {
-  padding: 60px 40px;
-  align-items: center;
-}
-.winners-wrap { max-width: 800px; width: 100%; }
-.winners-header {
-  text-align: center;
-  margin-bottom: 48px;
-}
-.winners-header h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 3.5rem;
-  letter-spacing: 0.08em;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.winners-header p { color: var(--muted); margin-top: 8px; }
-.winners-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
-.winner-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  animation: slide-in 0.4s ease both;
-}
-.winner-row .rank {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.6rem;
-  color: var(--gold);
-  width: 36px;
-  text-align: center;
-  flex-shrink: 0;
-}
-.winner-row .w-avatar {
-  width: 42px; height: 42px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-.winner-row .w-info { flex: 1; }
-.winner-row .w-name { font-weight: 600; font-size: 1rem; }
-.winner-row .w-email { font-size: 0.78rem; color: var(--muted); }
-.winner-row .w-prize {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(245,200,66,0.08);
-  border: 1px solid rgba(245,200,66,0.2);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--gold);
-}
-.winners-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.btn-outline-gold {
-  padding: 12px 28px;
-  background: transparent;
-  border: 1.5px solid var(--gold);
-  border-radius: 8px;
-  color: var(--gold);
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-outline-gold:hover { background: rgba(245,200,66,0.1); }
+/* ── WINNERS PAGE ── */
+#winnersPage{padding:56px 40px;align-items:center;}
+.winners-wrap{max-width:760px;width:100%;}
+.winners-header{text-align:center;margin-bottom:40px;}
+.winners-header h2{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:0.07em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.winners-header p{color:var(--muted);margin-top:6px;font-size:0.88rem;}
+.winners-grid{display:flex;flex-direction:column;gap:9px;margin-bottom:28px;}
+.winner-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 18px;animation:slide-in 0.4s ease both;}
+.winner-row .rank{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);width:32px;text-align:center;flex-shrink:0;}
+.winner-row .w-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem;flex-shrink:0;}
+.winner-row .w-info{flex:1;}
+.winner-row .w-name{font-weight:600;font-size:0.97rem;}
+.winner-row .w-email{font-size:0.76rem;color:var(--muted);}
+.winner-row .w-prize{display:flex;align-items:center;gap:5px;background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.18);border-radius:6px;padding:5px 11px;font-size:0.82rem;font-weight:600;color:var(--gold);}
+.winners-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.btn-outline-gold{padding:11px 24px;background:transparent;border:1.5px solid var(--gold);border-radius:8px;color:var(--gold);font-family:'Inter',sans-serif;font-weight:600;font-size:0.88rem;cursor:pointer;transition:all 0.2s;}
+.btn-outline-gold:hover{background:rgba(245,200,66,0.09);}
 
-/* TOAST */
-.toast {
-  position: fixed;
-  bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
-  background: var(--card);
-  border: 1px solid var(--green);
-  border-radius: 10px;
-  padding: 12px 24px;
-  font-size: 0.88rem;
-  color: var(--green);
-  z-index: 9999;
-  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  white-space: nowrap;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
+/* ── SETUP SHEET PAGE ── */
+#sheetSetupPage{align-items:center;justify-content:center;padding:40px 20px;}
+.sheet-wrap{width:100%;max-width:560px;}
+.sheet-hero{text-align:center;margin-bottom:32px;}
+.sheet-hero h2{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:0.07em;color:var(--gold);}
+.sheet-hero p{color:var(--muted);font-size:0.86rem;margin-top:6px;line-height:1.6;}
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+.step{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);line-height:1;flex-shrink:0;width:28px;}
+.step-info h4{font-size:0.9rem;font-weight:600;margin-bottom:3px;}
+.step-info p{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.step-info a{color:var(--gold);text-decoration:none;}
+.step-info code{background:var(--card2);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:var(--green);}
 
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+/* ── TOAST ── */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--green);border-radius:10px;padding:11px 22px;font-size:0.86rem;color:var(--green);z-index:9999;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
 
-@media (max-width: 700px) {
-  .wheel-wrap { width: 300px; height: 300px; }
-  #qrPage { flex-direction: column; }
-  .wheel-area { gap: 24px; }
-  #winnersPage { padding: 40px 20px; }
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+@media(max-width:700px){
+  .wheel-wrap{width:300px;height:300px;}
+  #qrPage{flex-direction:column;padding:40px 20px;}
+  .wheel-area{gap:20px;}
+  #winnersPage{padding:36px 18px;}
+  .wheel-side{max-width:100%;}
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-     PAGE 1 — ADMIN SETUP
-══════════════════════════════════════ -->
+<!-- ══ PAGE: ADMIN SETUP ══ -->
 <div id="adminPage" class="page active">
   <div class="admin-wrap">
     <div class="admin-logo">
-      <h1>🎁 GIVEAWAY</h1>
+      <h1>🎁 GIVEAWAY SETUP</h1>
       <p>Konfiguro giveaway-n për meetup-in tënd</p>
     </div>
 
@@ -674,11 +209,15 @@ canvas#wheelCanvas {
       <div class="card-title">// Informacionet e Eventit</div>
       <div class="field">
         <label>Emri i Eventit</label>
-        <input type="text" id="eventName" placeholder="p.sh. Crypto Meetup Tiranë 2025" value="Crypto Meetup Tiranë 2025">
+        <input type="text" id="eventName" placeholder="Crypto Meetup Tiranë 2025" value="Crypto Meetup Tiranë 2025">
       </div>
       <div class="field">
-        <label>Numri maksimal i fituesve për çmim</label>
-        <input type="number" id="winnersPerPrize" placeholder="5" value="3" min="1" max="50">
+        <label>Google Apps Script URL <span style="color:var(--red)">*</span></label>
+        <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/XXXXX/exec">
+        <div class="hint">
+          Nuk e ke ende? 
+          <a href="#" onclick="showSheetSetup(); return false;">Shiko udhëzuesin →</a>
+        </div>
       </div>
     </div>
 
@@ -687,110 +226,154 @@ canvas#wheelCanvas {
       <div class="prizes-list" id="prizesList">
         <div class="prize-row">
           <input type="text" placeholder="Emri i çmimit" value="👕 T-Shirt Meetup">
-          <input type="number" placeholder="Sasia" value="5" min="1">
+          <input type="number" placeholder="Sasi" value="5" min="1">
           <button class="btn-icon" onclick="removePrize(this)">✕</button>
         </div>
         <div class="prize-row">
-          <input type="text" placeholder="Emri i çmimit" value="🎒 Backpack Kripto">
-          <input type="number" placeholder="Sasia" value="2" min="1">
+          <input type="text" placeholder="Emri i çmimit" value="🎒 Backpack">
+          <input type="number" placeholder="Sasi" value="2" min="1">
           <button class="btn-icon" onclick="removePrize(this)">✕</button>
         </div>
         <div class="prize-row">
-          <input type="text" placeholder="Emri i çmimit" value="📚 Libër Investimi">
-          <input type="number" placeholder="Sasia" value="3" min="1">
+          <input type="text" placeholder="Emri i çmimit" value="📚 Libër">
+          <input type="number" placeholder="Sasi" value="3" min="1">
           <button class="btn-icon" onclick="removePrize(this)">✕</button>
         </div>
       </div>
       <button class="btn-add" onclick="addPrize()">+ Shto çmim tjetër</button>
     </div>
 
-      <div class="field">
-        <label>URL e faqes (për QR kod — ku do jetë live)</label>
-        <input type="text" id="siteUrl" placeholder="https://dunksmaster.github.io/puna-crypto/giveaway.html" value="https://dunksmaster.github.io/puna-crypto/giveaway.html">
-      </div>
-    </div>
-
     <button class="btn-primary" onclick="startGiveaway()">🚀 Fillo Giveaway-n</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     PAGE 0 — MOBILE REGISTRATION (shown when ?register=1)
-══════════════════════════════════════ -->
-<div id="mobilePage" class="page" style="align-items:center;justify-content:center;padding:40px 20px;">
-  <div style="width:100%;max-width:400px;">
-    <div style="text-align:center;margin-bottom:36px;">
-      <div style="font-size:3rem;margin-bottom:8px;">🎁</div>
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:0.08em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">REGJISTROHU</h1>
-      <p id="mobileEventName" style="color:var(--muted);font-size:0.9rem;margin-top:6px;">Crypto Meetup Giveaway</p>
+<!-- ══ PAGE: SHEET SETUP GUIDE ══ -->
+<div id="sheetSetupPage" class="page">
+  <div class="sheet-wrap">
+    <div class="sheet-hero">
+      <h2>📋 Konfiguro Google Sheet</h2>
+      <p>Bëhet një herë — zgjat 3 minuta. Kjo lejon regjistrimet nga telefonat të shfaqen live tek ti.</p>
     </div>
-    <div class="card">
-      <div id="mobileForm">
-        <div class="field">
-          <label>Emri dhe Mbiemri</label>
-          <input class="input-big" id="mobileRegName" type="text" placeholder="p.sh. Andi Koçi" autocomplete="name">
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <h4>Krijo Google Sheet të ri</h4>
+          <p>Shko te <a href="https://sheets.new" target="_blank">sheets.new</a> dhe krijo spreadsheet të ri. Emërojë <strong>Giveaway Registrations</strong>.</p>
         </div>
-        <div class="field" style="margin-top:-6px;">
-          <label>Email-i yt</label>
-          <input class="input-big" id="mobileRegEmail" type="email" placeholder="andi@email.com" autocomplete="email">
-        </div>
-        <button class="btn-primary" style="margin-top:8px;" onclick="mobileRegister()">✓ Regjistrohu për Giveaway</button>
       </div>
-      <div id="mobileSuccess" style="display:none;text-align:center;padding:20px 0;">
-        <div style="font-size:3rem;margin-bottom:12px;">🎉</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--green);margin-bottom:8px;">U REGJISTROVE!</div>
-        <div style="color:var(--muted);font-size:0.88rem;line-height:1.7;" id="mobileSuccessMsg">Emri yt u shtua në listën e shortit. Prit rezultatin!</div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <h4>Hap Apps Script</h4>
+          <p>Kliko <strong>Extensions → Apps Script</strong>. Fshi kodin ekzistues dhe paste kodin e mëposhtëm:</p>
+          <div style="margin-top:8px;background:var(--card2);border-radius:8px;padding:12px;font-size:0.72rem;color:var(--green);font-family:monospace;line-height:1.7;word-break:break-all;">
+            function doPost(e){<br>
+            &nbsp;&nbsp;var s=SpreadsheetApp.getActiveSheet();<br>
+            &nbsp;&nbsp;var d=JSON.parse(e.postData.contents);<br>
+            &nbsp;&nbsp;s.appendRow([new Date(),d.name,d.email]);<br>
+            &nbsp;&nbsp;return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);<br>
+            }<br>
+            function doGet(e){<br>
+            &nbsp;&nbsp;var s=SpreadsheetApp.getActiveSheet();<br>
+            &nbsp;&nbsp;var rows=s.getDataRange().getValues();<br>
+            &nbsp;&nbsp;var data=rows.slice(1).map(function(r){return{time:r[0],name:r[1],email:r[2]};});<br>
+            &nbsp;&nbsp;return ContentService.createTextOutput(JSON.stringify({entries:data})).setMimeType(ContentService.MimeType.JSON);<br>
+            }
+          </div>
+          <button onclick="copyScript()" style="margin-top:8px;padding:6px 14px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.3);border-radius:6px;color:var(--gold);font-size:0.75rem;cursor:pointer;font-family:'Inter',sans-serif;">📋 Kopjo Kodin</button>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <h4>Deploy si Web App</h4>
+          <p>Kliko <strong>Deploy → New Deployment → Web App</strong>. Te <em>Execute as</em>: <code>Me</code>. Te <em>Who has access</em>: <code>Anyone</code>. Kliko <strong>Deploy</strong> dhe autentifiko.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-info">
+          <h4>Kopjo URL-në dhe paste këtu</h4>
+          <p>Pas deploy, kopjo URL-në që fillon me <code>https://script.google.com/macros/s/...</code> dhe paste te hapi i mëparshëm.</p>
+        </div>
       </div>
     </div>
-    <p style="text-align:center;font-size:0.75rem;color:var(--muted);margin-top:16px;line-height:1.6;">Duke u regjistruar, pranon të marrësh email nëse fiton.<br>Të dhënat tua nuk ndahen me palë të treta.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-secondary" onclick="showPage('adminPage')">← Kthehu</button>
+      <button class="btn-primary" style="flex:1;" onclick="showPage('adminPage')">✓ E kam URL-në, kthehu</button>
+    </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     PAGE 2 — QR + REGISTRATION
-══════════════════════════════════════ -->
+<!-- ══ PAGE: QR + LIVE FEED (admin view only) ══ -->
 <div id="qrPage" class="page">
   <div class="qr-left">
-    <div class="qr-label" id="qrEventLabel">CRYPTO MEETUP</div>
-    <div class="qr-box">
-      <div id="qrCode"></div>
+    <div class="qr-event-name" id="qrEventLabel">CRYPTO MEETUP</div>
+    <div class="qr-box"><div id="qrCode"></div></div>
+    <div class="qr-instruction">Scano me telefon për t'u regjistruar në short</div>
+    <div class="qr-url-box">
+      <div class="lbl">URL e Regjistrimit</div>
+      <div class="url" id="qrUrlDisplay">—</div>
     </div>
-    <div class="qr-sub">Scano QR kodin për t'u regjistruar</div>
-    <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:4px;max-width:260px;text-align:center;">
-      <div style="font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">URL e Regjistrimit</div>
-      <div id="qrUrlDisplay" style="font-size:0.7rem;color:var(--gold);word-break:break-all;line-height:1.4;"></div>
-    </div>
-    <div class="entry-count">
-      <div class="num" id="entryCountNum">0</div>
-      <div class="lbl">Pjesëmarrës të regjistruar</div>
-    </div>
-    <button class="btn-secondary" onclick="goToAdmin()">← Ndrysho Cilësimet</button>
   </div>
 
   <div class="qr-right">
-    <div class="reg-card">
-      <div class="reg-title">Regjistrohu Tani 🎁</div>
-      <div class="reg-sub">Fut të dhënat tua për të marrë pjesë në short</div>
-      <input class="input-big" id="regName" type="text" placeholder="Emri dhe mbiemri" autocomplete="off">
-      <input class="input-big" id="regEmail" type="email" placeholder="Email-i yt" autocomplete="off">
-      <button class="btn-primary" onclick="registerEntry()">✓ Regjistrohu</button>
-      <div class="entries-feed" id="entriesFeed"></div>
+    <div class="entry-counter">
+      <div class="num" id="entryCountNum">0</div>
+      <div class="lbl">Pjesëmarrës të Regjistruar</div>
+      <div class="sync-status">
+        <div class="sync-dot"></div>
+        <span id="syncStatus" style="color:var(--muted);font-size:0.7rem;">Duke pritur regjistrime…</span>
+      </div>
+    </div>
+    <div class="entries-feed" id="entriesFeed">
+      <div class="empty">Asnjë regjistrim ende — prit që të skanojnë QR-në 📱</div>
     </div>
     <button class="btn-start-wheel" id="btnStartWheel" onclick="goToWheel()" disabled>
-      🎡 Fillo Shortun  <span id="entryCountBtn">(0 pjesëmarrës)</span>
+      🎡 Fillo Shortun &nbsp;<span id="entryCountBtn" style="font-weight:400;font-size:0.85rem;">(0 pjesëmarrës)</span>
     </button>
+    <div class="qr-footer-btns">
+      <button class="btn-secondary" onclick="goToAdmin()">← Cilësimet</button>
+      <button class="btn-secondary" onclick="fetchEntries()">↺ Rifresko</button>
+    </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     PAGE 3 — SPIN WHEEL
-══════════════════════════════════════ -->
+<!-- ══ PAGE: MOBILE REGISTRATION (shown when ?register=1) ══ -->
+<div id="mobilePage" class="page">
+  <div class="mobile-wrap">
+    <div class="mobile-hero">
+      <div class="emoji">🎁</div>
+      <h1>REGJISTROHU</h1>
+      <p id="mobileEventName">Crypto Meetup Giveaway</p>
+    </div>
+    <div class="mobile-card">
+      <div id="mobileForm">
+        <input class="input-big" id="mobileRegName" type="text" placeholder="Emri dhe Mbiemri" autocomplete="name">
+        <input class="input-big" id="mobileRegEmail" type="email" placeholder="Email-i yt" autocomplete="email">
+        <button class="btn-primary" id="mobileSubmitBtn" onclick="mobileRegister()">✓ Regjistrohu për Giveaway</button>
+      </div>
+      <div class="mobile-loading" id="mobileLoading">
+        <div class="spinner"></div>
+        Duke regjistruar…
+      </div>
+      <div class="mobile-success" id="mobileSuccess">
+        <div class="s-emoji">🎉</div>
+        <h2>U REGJISTROVE!</h2>
+        <p id="mobileSuccessMsg">Emri yt u shtua. Ji prezent kur të shpallet fituesi!</p>
+      </div>
+    </div>
+    <div class="mobile-footer">Duke u regjistruar pranon të marrësh email nëse fiton.<br>Të dhënat nuk ndahen me palë të treta.</div>
+  </div>
+</div>
+
+<!-- ══ PAGE: SPIN WHEEL ══ -->
 <div id="wheelPage" class="page">
   <div class="wheel-header">
     <h2>🎡 RROTULLIMI I SHORTIT</h2>
     <div class="prize-current">Çmimi aktual: <span id="currentPrizeName">—</span></div>
   </div>
-
   <div class="wheel-area">
     <div class="wheel-wrap">
       <div class="wheel-pointer">
@@ -798,45 +381,42 @@ canvas#wheelCanvas {
           <path d="M18 38 L2 4 Q18 12 34 4 Z" fill="#f5c842" stroke="#0a0a0f" stroke-width="1.5"/>
         </svg>
       </div>
-      <canvas id="wheelCanvas" width="420" height="420"></canvas>
+      <canvas id="wheelCanvas" width="400" height="400"></canvas>
       <div class="wheel-center" onclick="spinWheel()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f5c842" stroke-width="2.5" width="26">
           <polygon points="5,3 19,12 5,21"/>
         </svg>
       </div>
     </div>
-
     <div class="wheel-side">
       <div class="wheel-side-title">Çmimet</div>
       <div class="prize-queue" id="prizeQueue"></div>
-      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
         <button class="btn-spin" id="btnSpin" onclick="spinWheel()">🎯 Rrotulloje</button>
-        <button class="btn-secondary" onclick="goToWinners()">🏆 Shiko Fituesit</button>
+        <button class="btn-secondary" onclick="goToWinners()">🏆 Fituesit</button>
       </div>
-      <div style="margin-top:12px;font-size:0.75rem;color:var(--muted)" id="spinStatus">Kliko për të zgjedhur fituesin</div>
+      <div style="margin-top:10px;font-size:0.73rem;color:var(--muted);" id="spinStatus">Kliko për të zgjedhur fituesin</div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     PAGE 4 — WINNERS
-══════════════════════════════════════ -->
+<!-- ══ PAGE: WINNERS ══ -->
 <div id="winnersPage" class="page">
   <div class="winners-wrap">
     <div class="winners-header">
       <h2>🏆 FITUESIT</h2>
-      <p id="winnersSubtitle">Lista e plotë e fituesve të giveaway-t</p>
+      <p id="winnersSubtitle">Lista e plotë e fituesve</p>
     </div>
     <div class="winners-grid" id="winnersGrid"></div>
     <div class="winners-actions">
-      <button class="btn-outline-gold" onclick="goToWheel()">← Kthehu te Rrotullimi</button>
+      <button class="btn-outline-gold" onclick="goToWheel()">← Rrotullimi</button>
       <button class="btn-outline-gold" onclick="exportWinners()">📋 Kopjo Listën</button>
-      <button class="btn-primary" style="padding:12px 28px;" onclick="resetAll()">🔄 Giveaway i Ri</button>
+      <button class="btn-primary" style="padding:11px 24px;width:auto;" onclick="resetAll()">🔄 Giveaway i Ri</button>
     </div>
   </div>
 </div>
 
-<!-- WINNER MODAL -->
+<!-- ══ WINNER MODAL ══ -->
 <div class="modal-overlay" id="winnerModal">
   <div class="modal">
     <div class="confetti-wrap" id="confettiWrap"></div>
@@ -846,517 +426,354 @@ canvas#wheelCanvas {
     <div class="winner-email" id="modalWinnerEmail">—</div>
     <div class="winner-prize" id="modalWinnerPrize">🎁 Çmimi</div>
     <div class="modal-btns">
-      <button class="btn-primary" style="padding:11px 28px;" onclick="confirmWinner()">✓ Konfirmo Fituesin</button>
+      <button class="btn-primary" style="padding:11px 26px;width:auto;" onclick="confirmWinner()">✓ Konfirmo</button>
       <button class="btn-secondary" onclick="rejectWinner()">✕ Rirrotulloje</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 // ══════════════════════════════════════
 // STATE
 // ══════════════════════════════════════
+let cfg = { scriptUrl:'', eventName:'', prizes:[] };
 let state = {
-  eventName: '',
-  winnersPerPrize: 3,
-  prizes: [],        // [{name, qty, remaining, emoji}]
-  entries: [],       // [{name, email, time, color}]
-  winners: [],       // [{name, email, prize, prizeEmoji}]
-  currentPrizeIdx: 0,
-  spinning: false,
-  pendingWinner: null,
+  entries:[], winners:[],
+  currentPrizeIdx:0, spinning:false, pendingWinner:null
 };
-
-const COLORS = [
-  '#f5c842','#ff6b6b','#4ecdc4','#a29bfe','#fd79a8',
-  '#55efc4','#fdcb6e','#e17055','#74b9ff','#00b894',
-  '#d63031','#6c5ce7','#00cec9','#e84393','#f39c12'
-];
+const COLORS=['#f5c842','#ff6b6b','#4ecdc4','#a29bfe','#fd79a8','#55efc4','#fdcb6e','#e17055','#74b9ff','#00b894','#d63031','#6c5ce7','#00cec9','#e84393','#f39c12'];
+let pollTimer = null;
+let knownEmails = new Set();
 
 // ══════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-function goToAdmin() { showPage('adminPage'); }
-function goToWheel() { showPage('wheelPage'); buildPrizeQueue(); drawWheel(); }
-function goToWinners() { showPage('winnersPage'); renderWinners(); }
+function showPage(id){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function goToAdmin(){ clearInterval(pollTimer); showPage('adminPage'); }
+function showSheetSetup(){ showPage('sheetSetupPage'); }
+function goToWheel(){ showPage('wheelPage'); buildPrizeQueue(); drawWheel(); }
+function goToWinners(){ showPage('winnersPage'); renderWinners(); }
 
 // ══════════════════════════════════════
-// ADMIN — PRIZE MANAGEMENT
+// ADMIN
 // ══════════════════════════════════════
-function addPrize() {
-  const row = document.createElement('div');
-  row.className = 'prize-row';
-  row.innerHTML = `
-    <input type="text" placeholder="Emri i çmimit">
-    <input type="number" placeholder="Sasia" value="1" min="1">
-    <button class="btn-icon" onclick="removePrize(this)">✕</button>`;
-  document.getElementById('prizesList').appendChild(row);
+function addPrize(){
+  const r=document.createElement('div'); r.className='prize-row';
+  r.innerHTML=`<input type="text" placeholder="Emri i çmimit"><input type="number" placeholder="Sasi" value="1" min="1"><button class="btn-icon" onclick="removePrize(this)">✕</button>`;
+  document.getElementById('prizesList').appendChild(r);
 }
-function removePrize(btn) {
-  const rows = document.querySelectorAll('.prize-row');
-  if (rows.length > 1) btn.closest('.prize-row').remove();
-}
+function removePrize(btn){ const rows=document.querySelectorAll('.prize-row'); if(rows.length>1) btn.closest('.prize-row').remove(); }
 
-function startGiveaway() {
-  const name = document.getElementById('eventName').value.trim();
-  const wpp  = parseInt(document.getElementById('winnersPerPrize').value) || 3;
-  if (!name) return showToast('Fut emrin e eventit!', 'error');
+function startGiveaway(){
+  const name=document.getElementById('eventName').value.trim();
+  const url=document.getElementById('scriptUrl').value.trim();
+  if(!name) return showToast('Fut emrin e eventit!','error');
+  if(!url || !url.includes('script.google.com')) return showToast('Fut URL-në e Google Apps Script!','error');
 
-  const rows = document.querySelectorAll('.prize-row');
-  const prizes = [];
-  rows.forEach(r => {
-    const inputs = r.querySelectorAll('input');
-    const n = inputs[0].value.trim();
-    const q = parseInt(inputs[1].value) || 1;
-    if (n) prizes.push({ name: n, qty: q, remaining: q, emoji: n.match(/^\p{Emoji}/u)?.[0] || '🎁' });
+  const rows=document.querySelectorAll('.prize-row');
+  const prizes=[];
+  rows.forEach(r=>{
+    const ins=r.querySelectorAll('input');
+    const n=ins[0].value.trim(), q=parseInt(ins[1].value)||1;
+    if(n) prizes.push({name:n,qty:q,remaining:q,emoji:n.match(/^\p{Emoji}/u)?.[0]||'🎁'});
   });
-  if (!prizes.length) return showToast('Shto të paktën një çmim!', 'error');
+  if(!prizes.length) return showToast('Shto të paktën një çmim!','error');
 
-  state.eventName = name;
-  state.winnersPerPrize = wpp;
-  state.prizes = prizes;
-  state.entries = [];
-  state.winners = [];
-  state.currentPrizeIdx = 0;
+  cfg = { scriptUrl:url, eventName:name, prizes };
+  state = { entries:[], winners:[], currentPrizeIdx:0, spinning:false, pendingWinner:null };
+  knownEmails = new Set();
 
+  // Build QR
   document.getElementById('qrEventLabel').textContent = name.toUpperCase();
-
-  // Save to localStorage so mobile page can read event name
-  try {
-    localStorage.setItem('giveaway_event', name);
-    localStorage.setItem('giveaway_entries', JSON.stringify([]));
-    localStorage.setItem('giveaway_active', '1');
-  } catch(e) {}
-
-  // Build QR — use custom URL field if provided, else auto-detect
-  document.getElementById('qrCode').innerHTML = '';
-  const customUrl = (document.getElementById('siteUrl') || {}).value || '';
-  let base;
-  if (customUrl.trim()) {
-    base = customUrl.trim().replace(/\?.*$/, '');
-  } else if (window.location.protocol !== 'file:' && window.location.hostname) {
-    base = window.location.href.split('?')[0];
-  } else {
-    base = 'https://dunksmaster.github.io/puna-crypto/giveaway.html';
-  }
-  const regUrl = base + '?register=1';
+  const regUrl = window.location.href.split('?')[0] + '?register=1&event=' + encodeURIComponent(name) + '&script=' + encodeURIComponent(url);
   document.getElementById('qrUrlDisplay').textContent = regUrl;
-  new QRCode(document.getElementById('qrCode'), {
-    text: regUrl,
-    width: 200, height: 200,
-    colorDark: '#0a0a0f',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.M
-  });
+  document.getElementById('qrCode').innerHTML = '';
+  new QRCode(document.getElementById('qrCode'),{text:regUrl,width:200,height:200,colorDark:'#0a0a0f',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 
   showPage('qrPage');
-  renderEntries();
+  renderFeed();
   startPolling();
 }
 
-// Poll localStorage every 2s for entries added from mobile
-let pollInterval = null;
-function startPolling() {
-  if (pollInterval) clearInterval(pollInterval);
-  pollInterval = setInterval(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('giveaway_entries') || '[]');
-      // Merge new entries not already in state
-      let changed = false;
-      saved.forEach(e => {
-        if (!state.entries.find(x => x.email.toLowerCase() === e.email.toLowerCase())) {
-          e.color = COLORS[state.entries.length % COLORS.length];
-          state.entries.unshift(e);
-          changed = true;
+// ══════════════════════════════════════
+// GOOGLE SHEET SYNC
+// ══════════════════════════════════════
+function startPolling(){
+  fetchEntries();
+  clearInterval(pollTimer);
+  pollTimer = setInterval(fetchEntries, 5000);
+}
+
+function fetchEntries(){
+  if(!cfg.scriptUrl) return;
+  fetch(cfg.scriptUrl)
+    .then(r=>r.json())
+    .then(data=>{
+      if(!data.entries) return;
+      let changed=false;
+      data.entries.forEach(e=>{
+        if(!e.email) return;
+        const key=e.email.toLowerCase();
+        if(!knownEmails.has(key)){
+          knownEmails.add(key);
+          state.entries.unshift({
+            name:e.name||'—', email:e.email,
+            time: e.time ? new Date(e.time).toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'}) : '—',
+            color:COLORS[state.entries.length % COLORS.length]
+          });
+          changed=true;
         }
       });
-      if (changed) renderEntries();
-    } catch(e) {}
-  }, 2000);
+      if(changed) renderFeed();
+      document.getElementById('syncStatus').textContent='U sinkronizua: ' + new Date().toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'});
+    })
+    .catch(()=>{ document.getElementById('syncStatus').textContent='⚠ Gabim lidhje — duke u riprovuar…'; });
 }
 
-// ══════════════════════════════════════
-// REGISTRATION
-// ══════════════════════════════════════
-function registerEntry() {
-  const name  = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  if (!name) return showToast('Fut emrin tënd!', 'error');
-  if (!email || !email.includes('@')) return showToast('Fut një email valid!', 'error');
-  const dup = state.entries.find(e => e.email.toLowerCase() === email.toLowerCase());
-  if (dup) return showToast('Ky email është tashmë i regjistruar!', 'error');
-
-  const entry = {
-    name, email,
-    time: new Date().toLocaleTimeString('sq-AL', {hour:'2-digit', minute:'2-digit'}),
-    color: COLORS[state.entries.length % COLORS.length]
-  };
-  state.entries.unshift(entry);
-
-  document.getElementById('regName').value = '';
-  document.getElementById('regEmail').value = '';
-  document.getElementById('regName').focus();
-
-  renderEntries();
-  showToast(`✓ ${name} u regjistrua!`);
-}
-
-function renderEntries() {
-  const cnt = state.entries.length;
-  document.getElementById('entryCountNum').textContent = cnt;
-  document.getElementById('entryCountBtn').textContent = `(${cnt} pjesëmarrës)`;
-  const btn = document.getElementById('btnStartWheel');
-  btn.disabled = cnt < 1;
-
-  const feed = document.getElementById('entriesFeed');
-  feed.innerHTML = state.entries.slice(0, 30).map(e => `
+function renderFeed(){
+  const cnt=state.entries.length;
+  document.getElementById('entryCountNum').textContent=cnt;
+  document.getElementById('entryCountBtn').textContent=`(${cnt} pjesëmarrës)`;
+  document.getElementById('btnStartWheel').disabled = cnt<1;
+  const feed=document.getElementById('entriesFeed');
+  if(!cnt){ feed.innerHTML='<div class="empty">Asnjë regjistrim ende — prit që të skanojnë QR-në 📱</div>'; return; }
+  feed.innerHTML=state.entries.slice(0,40).map(e=>`
     <div class="entry-item">
-      <div class="entry-avatar" style="background:${e.color}22;color:${e.color}">
-        ${e.name.charAt(0).toUpperCase()}
-      </div>
-      <div style="flex:1;min-width:0;">
-        <div class="entry-name">${e.name}</div>
-        <div class="entry-email">${e.email}</div>
-      </div>
+      <div class="entry-avatar" style="background:${e.color}22;color:${e.color}">${e.name.charAt(0).toUpperCase()}</div>
+      <div class="entry-name">${e.name}</div>
       <div class="entry-time">${e.time}</div>
     </div>`).join('');
 }
 
 // ══════════════════════════════════════
+// MOBILE REGISTRATION
+// ══════════════════════════════════════
+function mobileRegister(){
+  const name=document.getElementById('mobileRegName').value.trim();
+  const email=document.getElementById('mobileRegEmail').value.trim();
+  if(!name) return showToast('Fut emrin tënd!','error');
+  if(!email||!email.includes('@')) return showToast('Fut një email valid!','error');
+
+  const scriptUrl=new URLSearchParams(window.location.search).get('script')||'';
+  if(!scriptUrl){ showToast('URL gabim — kontakto organizatorin','error'); return; }
+
+  document.getElementById('mobileForm').style.display='none';
+  document.getElementById('mobileLoading').style.display='block';
+  document.getElementById('mobileSubmitBtn').disabled=true;
+
+  fetch(scriptUrl,{
+    method:'POST',
+    body:JSON.stringify({name,email}),
+    headers:{'Content-Type':'application/json'}
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    document.getElementById('mobileLoading').style.display='none';
+    if(data.ok){
+      document.getElementById('mobileSuccess').style.display='block';
+      document.getElementById('mobileSuccessMsg').textContent=`${name}, emri yt u shtua në listën e shortit! Ji prezent kur të shpallet fituesi. 🍀`;
+    } else {
+      document.getElementById('mobileForm').style.display='block';
+      document.getElementById('mobileSubmitBtn').disabled=false;
+      showToast('Gabim regjistrimi — provo sërisht','error');
+    }
+  })
+  .catch(()=>{
+    document.getElementById('mobileLoading').style.display='none';
+    document.getElementById('mobileForm').style.display='block';
+    document.getElementById('mobileSubmitBtn').disabled=false;
+    showToast('Gabim rrjeti — provo sërisht','error');
+  });
+}
+
+// ══════════════════════════════════════
 // WHEEL
 // ══════════════════════════════════════
-const canvas = document.getElementById('wheelCanvas');
-const ctx = canvas.getContext('2d');
-let wheelAngle = 0;
-let wheelVelocity = 0;
-let wheelAnimFrame = null;
+const canvas=document.getElementById('wheelCanvas');
+const ctx=canvas.getContext('2d');
+let wheelAngle=0;
 
-function getAvailableEntries() {
-  const winnerEmails = state.winners.map(w => w.email.toLowerCase());
-  return state.entries.filter(e => !winnerEmails.includes(e.email.toLowerCase()));
-}
+function getAvailable(){ const we=state.winners.map(w=>w.email.toLowerCase()); return state.entries.filter(e=>!we.includes(e.email.toLowerCase())); }
 
-function drawWheel() {
-  const entries = getAvailableEntries();
-  const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 8;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if (!entries.length) {
-    ctx.fillStyle = '#1a1a28';
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#6b6b85';
-    ctx.font = 'bold 18px Inter';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('Nuk ka pjesëmarrës', cx, cy);
-    return;
+function drawWheel(){
+  const entries=getAvailable();
+  const cx=canvas.width/2, cy=canvas.height/2, r=cx-6;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!entries.length){
+    ctx.fillStyle='#1a1a28'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#6b6b85'; ctx.font='bold 16px Inter'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Nuk ka pjesëmarrës',cx,cy); return;
   }
-
-  const slice = (Math.PI * 2) / entries.length;
-  entries.forEach((entry, i) => {
-    const start = wheelAngle + i * slice;
-    const end   = start + slice;
-
-    // Slice
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, start, end);
-    ctx.closePath();
-    ctx.fillStyle = COLORS[i % COLORS.length];
-    ctx.fill();
-    ctx.strokeStyle = '#0a0a0f';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Text
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(start + slice / 2);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#0a0a0f';
-    ctx.font = `bold ${Math.min(14, Math.max(9, 280 / entries.length))}px Inter`;
-    const maxLen = 16;
-    const label = entry.name.length > maxLen ? entry.name.slice(0, maxLen) + '…' : entry.name;
-    ctx.fillText(label, r - 14, 5);
-    ctx.restore();
+  const slice=(Math.PI*2)/entries.length;
+  entries.forEach((e,i)=>{
+    const s=wheelAngle+i*slice, en=s+slice;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,s,en); ctx.closePath();
+    ctx.fillStyle=COLORS[i%COLORS.length]; ctx.fill();
+    ctx.strokeStyle='#0a0a0f'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(s+slice/2); ctx.textAlign='right';
+    ctx.fillStyle='#0a0a0f';
+    ctx.font=`bold ${Math.min(13,Math.max(8,260/entries.length))}px Inter`;
+    const lbl=e.name.length>15?e.name.slice(0,15)+'…':e.name;
+    ctx.fillText(lbl,r-12,4); ctx.restore();
   });
-
-  // Center circle
-  ctx.beginPath();
-  ctx.arc(cx, cy, 32, 0, Math.PI * 2);
-  ctx.fillStyle = '#0a0a0f';
-  ctx.fill();
-  ctx.strokeStyle = '#f5c842';
-  ctx.lineWidth = 3;
-  ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,28,0,Math.PI*2);
+  ctx.fillStyle='#0a0a0f'; ctx.fill();
+  ctx.strokeStyle='#f5c842'; ctx.lineWidth=2.5; ctx.stroke();
 }
 
-function spinWheel() {
-  if (state.spinning) return;
-  const available = getAvailableEntries();
-  if (!available.length) return showToast('Nuk ka pjesëmarrës të disponueshëm!', 'error');
-
-  const prize = state.prizes[state.currentPrizeIdx];
-  if (!prize || prize.remaining <= 0) {
-    advancePrize();
-    if (state.currentPrizeIdx >= state.prizes.length) {
-      showToast('Të gjitha çmimet janë dhënë!');
-      return goToWinners();
-    }
+function spinWheel(){
+  if(state.spinning) return;
+  const avail=getAvailable();
+  if(!avail.length) return showToast('Nuk ka pjesëmarrës!','error');
+  const prize=cfg.prizes[state.currentPrizeIdx];
+  if(!prize||prize.remaining<=0){ advancePrize(); if(state.currentPrizeIdx>=cfg.prizes.length){ showToast('Të gjitha çmimet u dhënë!'); return goToWinners(); } }
+  state.spinning=true;
+  document.getElementById('btnSpin').disabled=true;
+  document.getElementById('spinStatus').textContent='Duke rrotulluar…';
+  const extra=Math.PI*2*(6+Math.random()*5);
+  const dur=4000+Math.random()*2000;
+  const t0=performance.now(), a0=wheelAngle;
+  const ease=t=>1-Math.pow(1-t,4);
+  function anim(now){
+    const p=Math.min((now-t0)/dur,1);
+    wheelAngle=a0+extra*ease(p); drawWheel();
+    if(p<1){ requestAnimationFrame(anim); } else { wheelAngle=(a0+extra)%(Math.PI*2); drawWheel(); state.spinning=false; pickWinner(); }
   }
-
-  state.spinning = true;
-  document.getElementById('btnSpin').disabled = true;
-  document.getElementById('spinStatus').textContent = 'Duke rrotulluar...';
-
-  // Random spin: 6-10 full rotations + random stop
-  const extraAngle = (Math.PI * 2 * (6 + Math.random() * 4));
-  const targetAngle = wheelAngle + extraAngle;
-  const duration = 4000 + Math.random() * 2000;
-  const startTime = performance.now();
-  const startAngle = wheelAngle;
-
-  function ease(t) { return 1 - Math.pow(1 - t, 4); }
-
-  function animate(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    wheelAngle = startAngle + extraAngle * ease(progress);
-    drawWheel();
-
-    if (progress < 1) {
-      wheelAnimFrame = requestAnimationFrame(animate);
-    } else {
-      wheelAngle = targetAngle % (Math.PI * 2);
-      drawWheel();
-      state.spinning = false;
-      pickWinner();
-    }
-  }
-  requestAnimationFrame(animate);
+  requestAnimationFrame(anim);
 }
 
-function pickWinner() {
-  const entries = getAvailableEntries();
-  if (!entries.length) return;
-
-  const slice = (Math.PI * 2) / entries.length;
-  // Pointer is at top (3π/2 from 0, adjusted)
-  const normalised = ((Math.PI * 1.5 - wheelAngle) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-  const idx = Math.floor(normalised / slice) % entries.length;
-  const winner = entries[idx];
-  const prize  = state.prizes[state.currentPrizeIdx];
-
-  state.pendingWinner = { ...winner, prize: prize.name, prizeEmoji: prize.emoji };
-  showWinnerModal(state.pendingWinner);
-}
-
-function showWinnerModal(w) {
-  document.getElementById('modalWinnerName').textContent = w.name;
-  document.getElementById('modalWinnerEmail').textContent = w.email;
-  document.getElementById('modalWinnerPrize').textContent = `${w.prizeEmoji} ${w.prize}`;
+function pickWinner(){
+  const entries=getAvailable(); if(!entries.length) return;
+  const slice=(Math.PI*2)/entries.length;
+  const norm=((Math.PI*1.5-wheelAngle)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+  const idx=Math.floor(norm/slice)%entries.length;
+  const winner=entries[idx];
+  const prize=cfg.prizes[state.currentPrizeIdx];
+  state.pendingWinner={...winner,prize:prize.name,prizeEmoji:prize.emoji};
+  document.getElementById('modalWinnerName').textContent=winner.name;
+  document.getElementById('modalWinnerEmail').textContent=winner.email;
+  document.getElementById('modalWinnerPrize').textContent=prize.emoji+' '+prize.name;
   spawnConfetti();
   document.getElementById('winnerModal').classList.add('show');
 }
 
-function confirmWinner() {
-  if (!state.pendingWinner) return;
+function confirmWinner(){
+  if(!state.pendingWinner) return;
   state.winners.push(state.pendingWinner);
-
-  const prize = state.prizes[state.currentPrizeIdx];
-  prize.remaining--;
-  if (prize.remaining <= 0) advancePrize();
-
+  cfg.prizes[state.currentPrizeIdx].remaining--;
+  if(cfg.prizes[state.currentPrizeIdx].remaining<=0) advancePrize();
   document.getElementById('winnerModal').classList.remove('show');
-  document.getElementById('btnSpin').disabled = false;
-  document.getElementById('spinStatus').textContent = `Fitues ${state.winners.length} u konfirmua! Rrotulloje sërisht.`;
-  buildPrizeQueue();
-  drawWheel();
-  showToast(`🏆 ${state.pendingWinner.name} fitoi ${state.pendingWinner.prize}!`);
-  state.pendingWinner = null;
-
-  if (state.currentPrizeIdx >= state.prizes.length) {
-    document.getElementById('spinStatus').textContent = '🎉 Të gjitha çmimet janë dhënë!';
-    document.getElementById('btnSpin').disabled = true;
-    setTimeout(goToWinners, 1500);
-  }
+  document.getElementById('btnSpin').disabled=false;
+  document.getElementById('spinStatus').textContent=`Fitues ${state.winners.length} u konfirmua!`;
+  buildPrizeQueue(); drawWheel();
+  showToast(`🏆 ${state.pendingWinner.name} fitoi!`);
+  state.pendingWinner=null;
+  if(state.currentPrizeIdx>=cfg.prizes.length){ document.getElementById('btnSpin').disabled=true; setTimeout(goToWinners,1500); }
 }
 
-function rejectWinner() {
+function rejectWinner(){
   document.getElementById('winnerModal').classList.remove('show');
-  document.getElementById('btnSpin').disabled = false;
-  state.pendingWinner = null;
-  spinWheel();
+  document.getElementById('btnSpin').disabled=false;
+  state.pendingWinner=null; spinWheel();
 }
 
-function advancePrize() {
+function advancePrize(){
   state.currentPrizeIdx++;
-  if (state.currentPrizeIdx < state.prizes.length) {
-    const p = state.prizes[state.currentPrizeIdx];
-    document.getElementById('currentPrizeName').textContent = `${p.emoji} ${p.name} (${p.remaining} mbetur)`;
+  if(state.currentPrizeIdx<cfg.prizes.length){
+    const p=cfg.prizes[state.currentPrizeIdx];
+    document.getElementById('currentPrizeName').textContent=p.emoji+' '+p.name+' ('+p.remaining+' mbetur)';
   }
   buildPrizeQueue();
 }
 
-function buildPrizeQueue() {
-  const p = state.prizes[state.currentPrizeIdx];
-  if (p) document.getElementById('currentPrizeName').textContent = `${p.emoji} ${p.name} (${p.remaining} mbetur)`;
-
-  document.getElementById('prizeQueue').innerHTML = state.prizes.map((pr, i) => {
-    let status = 'pending', badge = 'Në pritje';
-    if (i < state.currentPrizeIdx) { status = 'done'; badge = 'Dhënë ✓'; }
-    if (i === state.currentPrizeIdx) { status = 'active'; badge = 'Aktiv'; }
-    return `
-      <div class="prize-queue-item ${status}">
-        <div class="pq-emoji">${pr.emoji}</div>
-        <div class="pq-info">
-          <div class="pq-name">${pr.name}</div>
-          <div class="pq-count">${pr.qty} copë · ${pr.remaining} mbetur</div>
-        </div>
-        <div class="pq-badge ${status}">${badge}</div>
-      </div>`;
+function buildPrizeQueue(){
+  const p=cfg.prizes[state.currentPrizeIdx];
+  if(p) document.getElementById('currentPrizeName').textContent=p.emoji+' '+p.name+' ('+p.remaining+' mbetur)';
+  document.getElementById('prizeQueue').innerHTML=cfg.prizes.map((pr,i)=>{
+    let st='pending',b='Në pritje';
+    if(i<state.currentPrizeIdx){st='done';b='Dhënë ✓';}
+    if(i===state.currentPrizeIdx){st='active';b='Aktiv';}
+    return`<div class="prize-queue-item ${st}"><div class="pq-emoji">${pr.emoji}</div><div class="pq-info"><div class="pq-name">${pr.name}</div><div class="pq-count">${pr.qty} copë · ${pr.remaining} mbetur</div></div><div class="pq-badge ${st}">${b}</div></div>`;
   }).join('');
 }
 
 // ══════════════════════════════════════
-// WINNERS PAGE
+// WINNERS
 // ══════════════════════════════════════
-function renderWinners() {
-  document.getElementById('winnersSubtitle').textContent =
-    `${state.winners.length} fitues nga ${state.entries.length} pjesëmarrës`;
-
-  document.getElementById('winnersGrid').innerHTML = state.winners.map((w, i) => `
+function renderWinners(){
+  document.getElementById('winnersSubtitle').textContent=state.winners.length+' fitues nga '+state.entries.length+' pjesëmarrës';
+  document.getElementById('winnersGrid').innerHTML=state.winners.map((w,i)=>`
     <div class="winner-row" style="animation-delay:${i*0.07}s">
       <div class="rank">${i+1}</div>
-      <div class="w-avatar" style="background:${COLORS[i%COLORS.length]}22;color:${COLORS[i%COLORS.length]}">
-        ${w.name.charAt(0).toUpperCase()}
-      </div>
-      <div class="w-info">
-        <div class="w-name">${w.name}</div>
-        <div class="w-email">${w.email}</div>
-      </div>
+      <div class="w-avatar" style="background:${COLORS[i%COLORS.length]}22;color:${COLORS[i%COLORS.length]}">${w.name.charAt(0).toUpperCase()}</div>
+      <div class="w-info"><div class="w-name">${w.name}</div><div class="w-email">${w.email}</div></div>
       <div class="w-prize">${w.prizeEmoji} ${w.prize}</div>
-    </div>`).join('') || '<div style="text-align:center;color:var(--muted);padding:40px">Nuk ka fitues ende.</div>';
+    </div>`).join('')||'<div style="text-align:center;color:var(--muted);padding:40px">Nuk ka fitues ende.</div>';
 }
 
-function exportWinners() {
-  const text = state.winners.map((w,i) =>
-    `${i+1}. ${w.name} — ${w.email} — ${w.prize}`).join('\n');
-  navigator.clipboard.writeText(text).then(() => showToast('📋 Lista u kopjua!'));
+function exportWinners(){
+  const t=state.winners.map((w,i)=>`${i+1}. ${w.name} — ${w.email} — ${w.prize}`).join('\n');
+  navigator.clipboard.writeText(t).then(()=>showToast('📋 Lista u kopjua!'));
 }
 
-function resetAll() {
-  if (!confirm('Je i sigurt? Kjo do të fshijë të gjitha të dhënat!')) return;
-  state = { eventName:'', winnersPerPrize:3, prizes:[], entries:[], winners:[], currentPrizeIdx:0, spinning:false, pendingWinner:null };
+function resetAll(){
+  if(!confirm('Fshij të gjitha të dhënat?')) return;
+  clearInterval(pollTimer);
+  cfg={scriptUrl:'',eventName:'',prizes:[]};
+  state={entries:[],winners:[],currentPrizeIdx:0,spinning:false,pendingWinner:null};
+  knownEmails=new Set();
   showPage('adminPage');
 }
 
 // ══════════════════════════════════════
 // CONFETTI
 // ══════════════════════════════════════
-function spawnConfetti() {
-  const wrap = document.getElementById('confettiWrap');
-  wrap.innerHTML = '';
-  const colors = ['#f5c842','#ff6b6b','#4ecdc4','#a29bfe','#fd79a8','#55efc4'];
-  for (let i = 0; i < 40; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.cssText = `
-      left:${Math.random()*100}%;
-      top:${-10 - Math.random()*40}px;
-      background:${colors[i%colors.length]};
-      width:${6+Math.random()*8}px;
-      height:${6+Math.random()*8}px;
-      animation-delay:${Math.random()*0.6}s;
-      animation-duration:${2+Math.random()*1.5}s;
-      transform:rotate(${Math.random()*360}deg);
-    `;
-    wrap.appendChild(el);
-  }
+function spawnConfetti(){
+  const w=document.getElementById('confettiWrap'); w.innerHTML='';
+  ['#f5c842','#ff6b6b','#4ecdc4','#a29bfe','#fd79a8','#55efc4'].forEach((c,ci)=>{
+    for(let i=0;i<7;i++){
+      const el=document.createElement('div'); el.className='confetti-piece';
+      el.style.cssText=`left:${Math.random()*100}%;top:${-10-Math.random()*30}px;background:${c};width:${6+Math.random()*7}px;height:${6+Math.random()*7}px;animation-delay:${Math.random()*0.5}s;animation-duration:${2+Math.random()*1.5}s;`;
+      w.appendChild(el);
+    }
+  });
 }
 
 // ══════════════════════════════════════
 // TOAST
 // ══════════════════════════════════════
-let toastTimer;
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.borderColor = type === 'error' ? 'var(--red)' : 'var(--green)';
-  t.style.color = type === 'error' ? 'var(--red)' : 'var(--green)';
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+let toastT;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.borderColor=type==='error'?'var(--red)':'var(--green)'; t.style.color=type==='error'?'var(--red)':'var(--green)';
+  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
 // ══════════════════════════════════════
-// MOBILE REGISTRATION PAGE
+// COPY SCRIPT HELPER
 // ══════════════════════════════════════
-function mobileRegister() {
-  const name  = document.getElementById('mobileRegName').value.trim();
-  const email = document.getElementById('mobileRegEmail').value.trim();
-  if (!name)  return mobileError('Fut emrin tënd!');
-  if (!email || !email.includes('@')) return mobileError('Fut një email valid!');
-
-  try {
-    const entries = JSON.parse(localStorage.getItem('giveaway_entries') || '[]');
-    if (entries.find(e => e.email.toLowerCase() === email.toLowerCase())) {
-      return mobileError('Ky email është tashmë i regjistruar!');
-    }
-    entries.push({
-      name, email,
-      time: new Date().toLocaleTimeString('sq-AL', {hour:'2-digit', minute:'2-digit'}),
-      fromMobile: true
-    });
-    localStorage.setItem('giveaway_entries', JSON.stringify(entries));
-  } catch(e) {}
-
-  document.getElementById('mobileForm').style.display = 'none';
-  document.getElementById('mobileSuccess').style.display = 'block';
-  document.getElementById('mobileSuccessMsg').textContent =
-    `${name}, emri yt u shtua në listën e shortit! Ji prezent kur të shpallet fituesi. 🍀`;
-}
-
-function mobileError(msg) {
-  showToast(msg, 'error');
+function copyScript(){
+  const code=`function doPost(e){var s=SpreadsheetApp.getActiveSheet();var d=JSON.parse(e.postData.contents);s.appendRow([new Date(),d.name,d.email]);return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);}function doGet(e){var s=SpreadsheetApp.getActiveSheet();var rows=s.getDataRange().getValues();var data=rows.slice(1).map(function(r){return{time:r[0],name:r[1],email:r[2]};});return ContentService.createTextOutput(JSON.stringify({entries:data})).setMimeType(ContentService.MimeType.JSON);}`;
+  navigator.clipboard.writeText(code).then(()=>showToast('✓ Kodi u kopjua!'));
 }
 
 // ══════════════════════════════════════
-// AUTO-DETECT: show mobile reg page if ?register=1
+// INIT — detect ?register=1
 // ══════════════════════════════════════
-(function init() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('register') === '1') {
-    // Show mobile registration page
-    const evName = localStorage.getItem('giveaway_event') || 'Crypto Meetup Giveaway';
-    document.getElementById('mobileEventName').textContent = evName;
+(function init(){
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('register')==='1'){
+    document.getElementById('mobileEventName').textContent=decodeURIComponent(p.get('event')||'Crypto Meetup Giveaway');
     showPage('mobilePage');
   }
-  // Init wheel canvas
   drawWheel();
 })();
 
-// ══════════════════════════════════════
-// ENTER KEY SUPPORT
-// ══════════════════════════════════════
-document.getElementById('regEmail').addEventListener('keydown', e => {
-  if (e.key === 'Enter') registerEntry();
-});
-document.getElementById('regName').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('regEmail').focus();
-});
-document.getElementById('mobileRegEmail').addEventListener('keydown', e => {
-  if (e.key === 'Enter') mobileRegister();
-});
-document.getElementById('mobileRegName').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('mobileRegEmail').focus();
-});
+// Enter keys
+document.getElementById('mobileRegEmail').addEventListener('keydown',e=>{if(e.key==='Enter')mobileRegister();});
+document.getElementById('mobileRegName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('mobileRegEmail').focus();});
 </script>
 </body>
 </html>
