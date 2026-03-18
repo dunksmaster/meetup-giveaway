@@ -6,6 +6,7 @@
 <title>Meetup Giveaway 🎁</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{--bg:#0a0a0f;--card:#12121a;--card2:#1a1a28;--border:rgba(255,255,255,0.07);--gold:#f5c842;--gold2:#ffab00;--green:#22d67a;--red:#ff4d6d;--text:#f0f0f8;--muted:#6b6b85;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -172,6 +173,36 @@ canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 0 5px rgba(245,200,66,0.1),0
 .lwc-rank-3{color:#CD7F32;}
 .lwc-rank-n{color:rgba(255,255,255,0.2);}
 
+/* ── SCREENSHOT ── */
+.btn-screenshot{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 24px;
+  background:linear-gradient(135deg,#1a1a2e,#16213e);
+  border:1.5px solid rgba(245,200,66,0.4);
+  border-radius:8px;color:var(--gold);
+  font-family:'Inter',sans-serif;font-weight:600;font-size:0.88rem;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-screenshot:hover{background:rgba(245,200,66,0.1);border-color:var(--gold);}
+.btn-screenshot:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-screenshot.loading{opacity:0.7;pointer-events:none;}
+
+#screenshotZone{
+  background:var(--bg);
+  border-radius:16px;
+  padding:8px;
+}
+#screenshotWatermark{
+  display:none;
+  text-align:center;
+  font-size:0.72rem;
+  color:var(--muted);
+  letter-spacing:0.08em;
+  padding-top:16px;
+  border-top:1px solid var(--border);
+  margin-top:8px;
+}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--green);border-radius:10px;padding:11px 22px;font-size:0.86rem;color:var(--green);z-index:9999;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -315,22 +346,32 @@ canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 0 5px rgba(245,200,66,0.1),0
 <div id="winnersPage" class="page">
   <div style="width:100%;max-width:700px;margin:0 auto;padding:48px 24px;">
 
-    <div style="text-align:center;margin-bottom:40px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:3.8rem;letter-spacing:0.08em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="boardTitle">🏆 FITUESIT</div>
-      <div style="color:var(--muted);font-size:0.85rem;margin-top:6px;" id="boardSubtitle">Lista live e fituesve</div>
+    <!-- ↓ This zone gets captured as JPG ↓ -->
+    <div id="screenshotZone">
+      <div style="text-align:center;margin-bottom:40px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3.8rem;letter-spacing:0.08em;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="boardTitle">🏆 FITUESIT</div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:6px;" id="boardSubtitle">Lista live e fituesve</div>
+      </div>
+
+      <!-- Live winners list -->
+      <div id="liveWinnersList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:36px;"></div>
+
+      <!-- Empty state -->
+      <div id="boardEmpty" style="text-align:center;color:var(--muted);padding:60px 0;font-size:0.9rem;">
+        Asnjë fitues ende — fillo rrotullimin 🎡
+      </div>
+
+      <!-- Watermark shown only in screenshot -->
+      <div id="screenshotWatermark">🎁 Meetup Giveaway · <span id="screenshotEventName"></span></div>
     </div>
 
-    <!-- Live winners list -->
-    <div id="liveWinnersList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:36px;"></div>
-
-    <!-- Empty state -->
-    <div id="boardEmpty" style="text-align:center;color:var(--muted);padding:60px 0;font-size:0.9rem;">
-      Asnjë fitues ende — fillo rrotullimin 🎡
-    </div>
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
       <button class="btn-outline-gold" onclick="goToWheel()">🎡 Vazhdo Shortun</button>
       <button class="btn-outline-gold" onclick="exportWinners()">📋 Kopjo Listën</button>
+      <button class="btn-screenshot" id="btnScreenshot" onclick="downloadScreenshot()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M8.5 3h7"/></svg>
+        Shkarko si JPG
+      </button>
       <button class="btn-primary" style="padding:11px 24px;width:auto;" onclick="resetAll()">🔄 Giveaway i Ri</button>
     </div>
   </div>
@@ -668,6 +709,49 @@ function spawnBoardConfetti(){
 function exportWinners(){
   const t=state.winners.map((w,i)=>`${i+1}. ${w.name} — ${w.prize}`).join('\n');
   navigator.clipboard.writeText(t).then(()=>showToast('📋 Lista u kopjua!'));
+}
+
+async function downloadScreenshot(){
+  if(!state.winners.length) return showToast('Nuk ka fitues për të shkrepur!','error');
+
+  const btn = document.getElementById('btnScreenshot');
+  const watermark = document.getElementById('screenshotWatermark');
+
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Duke krijuar…';
+
+  // Show watermark only during capture
+  document.getElementById('screenshotEventName').textContent = cfg.eventName || 'Meetup Giveaway';
+  watermark.style.display = 'block';
+
+  try {
+    const zone = document.getElementById('screenshotZone');
+    const canvas = await html2canvas(zone, {
+      backgroundColor: '#0a0a0f',
+      scale: 2,             // 2x resolution — crisp on mobile
+      useCORS: true,
+      logging: false,
+      width: zone.offsetWidth,
+      height: zone.offsetHeight,
+      windowWidth: zone.offsetWidth,
+    });
+
+    // Convert to JPG and download
+    const link = document.createElement('a');
+    const eventSlug = (cfg.eventName || 'giveaway').toLowerCase().replace(/\s+/g,'-');
+    link.download = `fituesit-${eventSlug}.jpg`;
+    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    link.click();
+
+    showToast('📸 JPG u shkarkua!');
+  } catch(err) {
+    showToast('Gabim gjatë screenshot-it — provo sërisht','error');
+    console.error(err);
+  } finally {
+    watermark.style.display = 'none';
+    btn.classList.remove('loading');
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M8.5 3h7"/></svg> Shkarko si JPG`;
+  }
 }
 
 function resetAll(){
