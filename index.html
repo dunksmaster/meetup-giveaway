@@ -365,13 +365,10 @@ canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 0 5px rgba(245,200,66,0.1),0
       <div id="screenshotWatermark">🎁 Meetup Giveaway · <span id="screenshotEventName"></span></div>
     </div>
 
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
-      <button class="btn-outline-gold" onclick="goToWheel()">🎡 Vazhdo Shortun</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:24px;">
+      <button class="btn-outline-gold" id="btnContinueWheel" onclick="goToWheel()">🎡 Vazhdo Shortun</button>
       <button class="btn-outline-gold" onclick="exportWinners()">📋 Kopjo Listën</button>
-      <button class="btn-screenshot" id="btnScreenshot" onclick="downloadScreenshot()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M8.5 3h7"/></svg>
-        Shkarko si JPG
-      </button>
+      <button class="btn-screenshot" id="btnScreenshot" onclick="downloadScreenshot()">📸 Shkarko si JPG</button>
       <button class="btn-primary" style="padding:11px 24px;width:auto;" onclick="resetAll()">🔄 Giveaway i Ri</button>
     </div>
   </div>
@@ -675,10 +672,12 @@ function renderWinners(newWinner){
   // FIX #5 — only show "finished" if prizes actually exist and are done
   if(cfg.prizes && cfg.prizes.length > 0 && isFinished()){
     boardTitle.textContent = '🏆 GIVEAWAY PËRFUNDOI!';
-    const continueBtn = document.querySelector('#winnersPage .btn-outline-gold');
+    const continueBtn = document.getElementById('btnContinueWheel');
     if(continueBtn) continueBtn.textContent = '🏁 Giveaway Përfundoi';
   } else {
     boardTitle.textContent = '🏆 FITUESIT';
+    const continueBtn = document.getElementById('btnContinueWheel');
+    if(continueBtn) continueBtn.textContent = '🎡 Vazhdo Shortun';
   }
 
   // FIX #6 — confetti only on new winner confirmation
@@ -750,7 +749,7 @@ async function downloadScreenshot(){
   } finally {
     watermark.style.display = 'none';
     btn.classList.remove('loading');
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M8.5 3h7"/></svg> Shkarko si JPG`;
+    btn.innerHTML = '📸 Shkarko si JPG';
   }
 }
 
